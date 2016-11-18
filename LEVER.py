@@ -8,6 +8,7 @@ import time
 #ポート設定
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(25, GPIO.OUT)
+#GPIO.setup(23,GPIO.OUT)
 GPIO.setup(24, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
 #実験開始プロセス
@@ -38,6 +39,7 @@ try:
 	while True:
 		if GPIO.input(24) == GPIO.HIGH:									#押すと
 			GPIO.output(25, GPIO.HIGH)									#LEDライトのポートに 3.3v の電流を
+			# GPIO.output(23, GPIO.HIGH)
 			time1 = time.time()											#反応瞬間の時間
 			print ("Trail ",trail)										#試行数
 			print ("Time ",time1-time0)									#最初からかかっていた時間
