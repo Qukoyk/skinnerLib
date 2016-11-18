@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+
 #import文
 import RPi.GPIO as GPIO
 from time import sleep
