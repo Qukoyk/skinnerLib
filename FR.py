@@ -4,7 +4,7 @@
 FR.py
 基礎統制libのFRスクリプト
 
-デフォルトはFR10, ITI10s, 10試行
+デフォルトはFR10, ITI10s, 10回
 '''
 
 __author__ = "Qukoyk"
@@ -14,19 +14,19 @@ __contacts__ = "m172236@hiroshima-u.ac.jp"
 #前置き宣言
 x = 10 # FR x
 iti = 10 # ITI 10s
-trialsMax = 10 # 総試行数
+trailsMax = 10 # 総回数
 
 #ポート宣言
-leverLeftAct = 26
-leverLeftMove = 19
-leverRightAct = 20
-leverRightMove = 16
-lightLeft =6
+leverLeftAct = 22
+leverLeftMove = 17
+leverRightAct = 23
+leverRightMove = 18
+lightLeft = 6
 lightRight = 12
-houseLight = 13
-feeder = 21
-buzzer = 5
-handShaping = 25
+houseLight = 24
+feeder = 27
+buzzer = 25
+handShaping = 5
 
 #import文
 import RPi.GPIO as GPIO
@@ -46,6 +46,9 @@ GPIO.setup(leverLeftAct, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 GPIO.setup(leverRightAct, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 GPIO.setup(handShaping, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
+GPIO.output(leverLeftMove,GPIO.HIGH)
+
+
 #実験開始プロセス
 answer2 = input("今回の番号は？:\n")
 print ("始めますか？")
@@ -60,7 +63,7 @@ while True:
 		sleep(0.1)
 		
 #データ初期化
-trial = 0
+trail = 0
 react = 0
 time0 = time.time()
 time2 = time.time()
@@ -68,46 +71,49 @@ timePast = 0
 day = time.strftime("%Y-%m-%d")
 with open(day + "_" + answer2 + '.csv' , 'a+') as myfile:
 	writer = csv.writer(myfile)
-	writer.writerow(['Trial','Time'])
+	writer.writerow(['Trail','Time'])
 	
 #データ保存先を指定
 leverLeftActData = []
 
 
 #メインプログラム
-while trial<=trialsMax:
-	GPIO.output(leverLeftMove,GPIO.HIGH)
-	if GPIO.input(leverLeftAct) == GPIO.HIGH:
+try:
+	while True:
 		GPIO.output(leverLeftMove,GPIO.LOW)
-		react = react+1
-		print(react,"/",x)
-		if react == x:
-			GPIO.output(feeder,GPIO.HIGH)
-			react = 0
-			time1 = time.time()
-			trial = trial+1
-			timePast = round(time1-time0,2)
-			print ("Trial ", trial,"/",trialsMax)
-			print ("Time ",timePast,"\n")
-			time2 = time.time()
-			leverLeftActData = [str(trial),str(timePast)]
-			with open(day+"_"+answer2+'.csv','a+') as myfile:
-				writer = csv.writer(myfile)
-				writer.writerow(leverLeftActData)
+		if GPIO.input(leverLeftAct) == GPIO.HIGH:
+			react = react+1
+			print(react,"/",x)
+			if react == x:
+				GPIO.output(feeder,GPIO.HIGH)
+				react = 0
+				time1 = time.time()
+				trail = trail+1
+				timePast = round(time1-time0,2)
+				print ("Trail ", trail,"/",trailsMax)
+				print ("Time ",timePast,"\n")
+				time2 = time.time()
+				leverLeftActData = [str(trail),str(timePast)]
+				with open(day+"_"+answer2+'.csv','a+') as myfile:
+					writer = csv.writer(myfile)
+					writer.writerow(leverLeftActData)
+				while GPIO.input(leverLeftAct) == GPIO.LOW:
+					sleep(0.01)
+				print ("ITI",iti,"s","\n")
+				GPIO.output(leverLeftMove,GPIO.HIGH)
+				sleep(iti)
+				time0 = time.time()
 			while GPIO.input(leverLeftAct) == GPIO.HIGH:
 				sleep(0.01)
-			print ("ITI",iti,"s","\n")
-			sleep(iti)
-			time0 = time.time()
-		while GPIO.input(leverLeftAct) == GPIO.HIGH:
-			sleep(0.01)
-		
-		else:
-			GPIO.output(feeder,GPIO.LOW)
-		sleep(0.01)	
+			
+			
+			if trail == trailsMax:
+				myfile.close()
+				break
 
-else:
-	myfile.close()
+		else:
+			GPIO.output(feeder,GPIO.HIGH)
+		sleep(0.01)	
 
 
 #終了

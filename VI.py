@@ -3,7 +3,6 @@
 '''
 VI.py
 基礎統制libのVIスクリプト
-
 デフォルトはVI10s, ITI10s, 10試行
 '''
 
@@ -17,16 +16,16 @@ iti = 10  # ITI 10s
 trialsMax = 10  # 総回数
 
 # ポート宣言
-leverLeftAct = 26
-leverLeftMove = 19
-leverRightAct = 20
-leverRightMove = 16
+leverLeftAct = 22
+leverLeftMove = 17
+leverRightAct = 23
+leverRightMove = 18
 lightLeft = 6
 lightRight = 12
-houseLight = 13
-feeder = 21
-buzzer = 5
-handShaping = 25
+houseLight = 24
+feeder = 27
+buzzer = 25
+handShaping = 5
 
 # import文
 import RPi.GPIO as GPIO
@@ -47,27 +46,7 @@ GPIO.setup(leverLeftAct, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 GPIO.setup(leverRightAct, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 GPIO.setup(handShaping, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
-# 実験開始プロセス
-answer2 = input("今回の番号は？:\n")
-print("始めますか？")
-answer = input("Press y:\n")
-while True:
-    if answer == "y":
-        print("")
-        print("=======START!=======")
-        print("")
-        break
-    else:
-        sleep(0.1)
-
-# データ初期化
-trial = 0
-timeCount = 0
-time0 = time.time()
-time2 = time.time()
-timePast = 0
-day = time.strftime("%Y-%m-%d")
-listPosition = 0
+GPIO.output(leverLeftMove,GPIO.HIGH)
 
 average = 0
 myList = []
@@ -95,6 +74,29 @@ except KeyboardInterrupt:
     pass
 
 
+# 実験開始プロセス
+answer2 = input("今回の番号は？:\n")
+print("始めますか？")
+answer = input("Press y:\n")
+while True:
+    if answer == "y":
+        print("")
+        print("=======START!=======")
+        print("")
+        break
+    else:
+        sleep(0.1)
+
+# データ初期化
+trial = 0
+timeCount = 0
+time0 = time.time()
+time2 = time.time()
+timePast = 0
+day = time.strftime("%Y-%m-%d")
+listPosition = 0
+
+
 with open(day + "_" + answer2 + '.csv', 'a+') as myfile:
     writer = csv.writer(myfile)
     writer.writerow(['Trial', 'Time'])
@@ -104,43 +106,49 @@ leverLeftActData = []
 
 
 # メインプログラム
-while trial < trialsMax:
+try:
+	while True:
+		
+		GPIO.output(leverLeftMove, GPIO.LOW)
+		for timeCount in range(tenList[listPosition]):
+			print(timeCount + 1, "s/", tenList[listPosition], "s")
+			sleep(1)
+		while GPIO.input(leverLeftAct) == GPIO.LOW:
+			sleep(0.01)
+	
+		if GPIO.input(leverLeftAct) == GPIO.HIGH:
+			GPIO.output(feeder, GPIO.HIGH)
+			time1 = time.time()
+			listPosition = listPosition + 1
+			trial = trial + 1
+			timePast = round(time1 - time0, 2)
+			print("Trial ", trial, "/", trialsMax)
+			print("Time ", timePast, "\n")
+			time2 = time.time()
+			leverLeftActData = [str(trial), str(timePast)]
+			with open(day + "_" + answer2 + '.csv', 'a+') as myfile:
+				writer = csv.writer(myfile)
+				writer.writerow(leverLeftActData)
+			print("ITI", iti, "s\n")
+			GPIO.output(leverLeftMove,GPIO.HIGH)
+			sleep(iti)
+			time0 = time.time()
+		while GPIO.input(leverLeftAct) == GPIO.HIGH:
+			sleep(0.01)
+			
+		if trial == trialsMax:
+			myfile.close()
+			break
+	
+		else:
+			GPIO.output(feeder, GPIO.LOW)
+		sleep(0.01)
 
-    GPIO.output(leverLeftMove, GPIO.HIGH)
-    for timeCount in range(tenList[listPosition]):
-        print(timeCount + 1, "s/", listPosition, "s")
-        sleep(1)
-    while GPIO.input(leverLeftAct) == GPIO.LOW:
-        sleep(0.01)
-
-    if GPIO.input(leverLeftAct) == GPIO.HIGH:
-        GPIO.output(leverLeftMove, GPIO.LOW)
-        GPIO.output(feeder, GPIO.HIGH)
-        time1 = time.time()
-		listPosition = listPosition + 1
-        trial = trial + 1
-        timePast = round(time1 - time0, 2)
-        print("Trial ", trial, "/", trialsMax)
-        print("Time ", timePast, "\n")
-        time2 = time.time()
-        leverLeftActData = [str(trial), str(timePast)]
-        with open(day + "_" + answer2 + '.csv', 'a+') as myfile:
-            writer = csv.writer(myfile)
-            writer.writerow(leverLeftActData)
-        print("ITI", iti, "s\n")
-        sleep(iti)
-        time0 = time.time()
-        while GPIO.input(leverLeftAct) == GPIO.HIGH:
-            sleep(0.01)
-
-    else:
-        GPIO.output(feeder, GPIO.LOW)
-    sleep(0.01)
-
-else:
-    myfile.close()
+	else:
+		myfile.close()
 
 
 # ポート釈放
-myfile.close()
-GPIO.cleanup()
+except KeyboardInterrupt:
+	myfile.close()
+	GPIO.cleanup()
