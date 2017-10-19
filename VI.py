@@ -32,7 +32,8 @@ import RPi.GPIO as GPIO
 from time import sleep
 import time
 import csv
-import math,random
+import math
+import random
 
 # ポート設定
 GPIO.setmode(GPIO.BCM)
@@ -46,7 +47,7 @@ GPIO.setup(leverLeftAct, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 GPIO.setup(leverRightAct, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 GPIO.setup(handShaping, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
-GPIO.output(leverLeftMove,GPIO.HIGH)
+GPIO.output(leverLeftMove, GPIO.HIGH)
 
 average = 0
 myList = []
@@ -56,9 +57,9 @@ tenList = []
 for values in range(1, 55):
     # gauss = random.gauss(x,math.sqrt(trialsMax))   #正規分布に従う乱数
     # myList.append(int(gauss))                      #を使いたいならこれ
-    myList.append(values)                            #そしてこれをコメントアウト
+    myList.append(values)  # そしてこれをコメントアウト
 
-print ("乱数生成中……")
+print("乱数生成中……")
 
 try:
     while True:
@@ -107,48 +108,48 @@ leverLeftActData = []
 
 # メインプログラム
 try:
-	while True:
-		
-		GPIO.output(leverLeftMove, GPIO.LOW)
-		for timeCount in range(tenList[listPosition]):
-			print(timeCount + 1, "s/", tenList[listPosition], "s")
-			sleep(1)
-		while GPIO.input(leverLeftAct) == GPIO.LOW:
-			sleep(0.01)
-	
-		if GPIO.input(leverLeftAct) == GPIO.HIGH:
-			GPIO.output(feeder, GPIO.HIGH)
-			time1 = time.time()
-			listPosition = listPosition + 1
-			trial = trial + 1
-			timePast = round(time1 - time0, 2)
-			print("Trial ", trial, "/", trialsMax)
-			print("Time ", timePast, "\n")
-			time2 = time.time()
-			leverLeftActData = [str(trial), str(timePast)]
-			with open(day + "_" + answer2 + '.csv', 'a+') as myfile:
-				writer = csv.writer(myfile)
-				writer.writerow(leverLeftActData)
-			print("ITI", iti, "s\n")
-			GPIO.output(leverLeftMove,GPIO.HIGH)
-			sleep(iti)
-			time0 = time.time()
-		while GPIO.input(leverLeftAct) == GPIO.HIGH:
-			sleep(0.01)
-			
-		if trial == trialsMax:
-			myfile.close()
-			break
-	
-		else:
-			GPIO.output(feeder, GPIO.LOW)
-		sleep(0.01)
+    while True:
 
-	else:
-		myfile.close()
+        GPIO.output(leverLeftMove, GPIO.LOW)
+        for timeCount in range(tenList[listPosition]):
+            print(timeCount + 1, "s/", tenList[listPosition], "s")
+            sleep(1)
+        while GPIO.input(leverLeftAct) == GPIO.LOW:
+            sleep(0.01)
+
+        if GPIO.input(leverLeftAct) == GPIO.HIGH:
+            GPIO.output(feeder, GPIO.HIGH)
+            time1 = time.time()
+            listPosition = listPosition + 1
+            trial = trial + 1
+            timePast = round(time1 - time0, 2)
+            print("Trial ", trial, "/", trialsMax)
+            print("Time ", timePast, "\n")
+            time2 = time.time()
+            leverLeftActData = [str(trial), str(timePast)]
+            with open(day + "_" + answer2 + '.csv', 'a+') as myfile:
+                writer = csv.writer(myfile)
+                writer.writerow(leverLeftActData)
+            print("ITI", iti, "s\n")
+            GPIO.output(leverLeftMove, GPIO.HIGH)
+            sleep(iti)
+            time0 = time.time()
+        while GPIO.input(leverLeftAct) == GPIO.HIGH:
+            sleep(0.01)
+
+        if trial == trialsMax:
+            myfile.close()
+            break
+
+        else:
+            GPIO.output(feeder, GPIO.LOW)
+        sleep(0.01)
+
+    else:
+        myfile.close()
 
 
 # ポート釈放
 except KeyboardInterrupt:
-	myfile.close()
-	GPIO.cleanup()
+    myfile.close()
+    GPIO.cleanup()
