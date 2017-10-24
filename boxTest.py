@@ -45,54 +45,58 @@ GPIO.output(leverLeftMove, GPIO.HIGH)
 GPIO.output(leverRightMove, GPIO.HIGH)
 
 # 関数設定
+
+
 def begin(equipmentName):
-    print("\n", equipmentName,"番ポートテスト開始")
+    print("\n", equipmentName, "番ポートテスト開始")
     pass
+
 
 def confirm(equipmentName):
     print("\n", "異常がないと y を押してください")
     answer = input("Press y:\n")
     while True:
         if answer == "y":
-            print("\n", "=====", str(equipmentName), "番ポート異常なし", "=====","\n")
+            print("\n", "=====", str(equipmentName), "番ポート異常なし", "=====", "\n")
             break
     pass
 
+
 def test(equipmentName):
-    GPIO.output(equipmentName,GPIO.LOW)
+    GPIO.output(equipmentName, GPIO.LOW)
     sleep(0.5)
-    GPIO.output(equipmentName,GPIO.HIGH)
+    GPIO.output(equipmentName, GPIO.HIGH)
     sleep(0.5)
-    GPIO.output(equipmentName,GPIO.LOW)
+    GPIO.output(equipmentName, GPIO.LOW)
     sleep(0.5)
-    GPIO.output(equipmentName,GPIO.HIGH)
+    GPIO.output(equipmentName, GPIO.HIGH)
     sleep(0.5)
     pass
-    
+
+
 def test2(equipmentName):
-	GPIO.output(equipmentName,GPIO.HIGH)
-	sleep(0.5)
-	GPIO.output(equipmentName,GPIO.LOW)
-	sleep(0.5)
-	GPIO.output(equipmentName,GPIO.HIGH)
-	sleep(0.5)
-	GPIO.output(equipmentName,GPIO.LOW)
-	sleep(0.5)
-	pass
+    GPIO.output(equipmentName, GPIO.HIGH)
+    sleep(0.5)
+    GPIO.output(equipmentName, GPIO.LOW)
+    sleep(0.5)
+    GPIO.output(equipmentName, GPIO.HIGH)
+    sleep(0.5)
+    GPIO.output(equipmentName, GPIO.LOW)
+    sleep(0.5)
+    pass
 
 
 # 検査開始
-print("\n"+"設備検査プログラム")
-print("パーツは2回 点滅/動く のは正常状態", "\n","\n","\n")
+print("\n" + "設備検査プログラム")
+print("パーツは2回 点滅/動く のは正常状態", "\n", "\n", "\n")
 print("始めますか？")
 answer = input("Press y:\n")
 while True:
     if answer == "y":
-        print("\n","=======START!=======","\n")
+        print("\n", "=======START!=======", "\n")
         break
     else:
         sleep(0.1)
-
 
 
 # メインプログラム
@@ -126,6 +130,6 @@ begin(feeder)
 test(feeder)
 confirm(feeder)
 
-print("\n","\n","\n","実験箱異常ありませんでした")
+print("\n", "\n", "\n", "実験箱異常ありませんでした")
 # ポート釈放
 GPIO.cleanup()
