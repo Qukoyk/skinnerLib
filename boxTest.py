@@ -45,8 +45,6 @@ GPIO.output(leverLeftMove, GPIO.HIGH)
 GPIO.output(leverRightMove, GPIO.HIGH)
 
 # 関数設定
-
-
 def begin(equipmentName):
     print("\n", equipmentName, "番ポートテスト開始")
     pass
