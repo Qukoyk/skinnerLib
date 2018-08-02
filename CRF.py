@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 '''
-CRF_100Trails.py
+CRF_100Trials.py
 基礎統制libのCRFスクリプト
 '''
 
@@ -40,13 +40,13 @@ while True:
         sleep(0.1)
         
 #初期化数据
-trail = 0
+trial = 0
 time0 = time.time() #始まりの時間
 time2 = time.time() #前回反応の時間点
 day = time.strftime("%Y-%m-%d")
 with open(day+"_"+answer2 + '.csv','a+') as myfile:
     writer = csv.writer(myfile)
-    writer.writerow(['Trail','Switches','Time'])
+    writer.writerow(['Trial','Switches','Time'])
 
 #データ保存先を指定
 ratLeverData = []
@@ -59,14 +59,14 @@ try:
         if GPIO.input(ratLever) == GPIO.HIGH: #押されると
             GPIO.output(feeder, GPIO.HIGH)
             time1 = time.time() #反応瞬間の時間
-            trail = trail+1
-            print ("Trail ",trail) #試行数
+            trial = trial+1
+            print ("Trial ",trial) #試行数
             print ("ratLever")
             print ("Time ",round(time1-time0,2)) #最初からかかっていた時間
             print ("")
             # GPIO.output(23,GPIO.HIGH)       #Feeder on
             time2 = time.time()
-            ratLeverData = [str(trail),str("ratLever"),str(round(time1-time0,2))]
+            ratLeverData = [str(trial),str("ratLever"),str(round(time1-time0,2))]
             with open(day+"_"+answer2 + '.csv','a+') as myfile:
                 writer = csv.writer(myfile)
                 writer.writerow(ratLeverData)
@@ -76,20 +76,20 @@ try:
         if GPIO.input(handShaping) == GPIO.HIGH:
             GPIO.output(feeder, GPIO.HIGH)
             time1 = time.time()
-            trail = trail+1
-            print ("Trail ",trail)
+            trial = trial+1
+            print ("Trial ",trial)
             print ("handShaping")
             print ("Time ",round(time1-time0,2))
             print ("")
             time2 = time.time()
-            handShapingData = [str(trail-1),str("handShaping"),str(round(time1-time0,2))]
+            handShapingData = [str(trial-1),str("handShaping"),str(round(time1-time0,2))]
             with open(day+"_"+answer2 + '.csv','a+') as myfile:
                 writer = csv.writer(myfile)
                 writer.writerow(handShapingData)
             while GPIO.input(handShaping) == GPIO.HIGH:
                 sleep(0.01)
         
-        if trail == 100:
+        if trial == 100:
             myfile.close()
             break
             
