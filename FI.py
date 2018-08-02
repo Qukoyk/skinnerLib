@@ -53,14 +53,14 @@ answer2 = input("今回の番号は？:\n")
 print ("始めますか？")
 answer = input("Press y:\n")
 while True:
-	if answer == "y":
-		print ("")
-		print ("=======START!=======")
-		print ("")
-		break
-	else:
-		sleep(0.1)
-		
+    if answer == "y":
+        print ("")
+        print ("=======START!=======")
+        print ("")
+        break
+    else:
+        sleep(0.1)
+        
 #データ初期化
 trail = 0
 timeCount = 0
@@ -70,56 +70,54 @@ timePast = 0
 day = time.strftime("%Y-%m-%d")
 
 with open(day + "_" + answer2 + '.csv' , 'a+') as myfile:
-	writer = csv.writer(myfile)
-	writer.writerow(['Trail','Time'])
-	
+    writer = csv.writer(myfile)
+    writer.writerow(['Trail','Time'])
+    
 #データ保存先を指定
 leverLeftActData = []
 
-
 #メインプログラム
 try:
-	while True:
-	
-
+    while True:
         GPIO.output(leverLeftMove,GPIO.LOW)
         for timeCount in range(x):
-			print (timeCount+1,"s/",x,"s")
-			sleep(1)
-		while GPIO.input(leverLeftAct) == GPIO.LOW:
-			sleep(0.01)
+            print (timeCount+1,"s/",x,"s")
+            sleep(1)
+        while GPIO.input(leverLeftAct) == GPIO.LOW:
+            sleep(0.01)
 
-		if GPIO.input(leverLeftAct) == GPIO.HIGH:
-			GPIO.output(feeder,GPIO.HIGH)
-			time1 = time.time()
-			trail = trail+1
-			timePast = round(time1-time0,2)
-			print ("Trail ",trail,"/",trailsMax)
-			print ("Time ",timePast,"\n")
-			time2 = time.time()
-			leverLeftActData = [str(trail),str(timePast)]
-			with open(day+"_"+answer2+'.csv','a+') as myfile:
-				writer = csv.writer(myfile)
-				writer.writerow(leverLeftActData)
-			print ("ITI",iti,"s:\n")
-			GPIO.output(leverLeftMove,GPIO.HIGH)
-			sleep(iti)
-			time0 = time.time()
-			while GPIO.input(leverLeftAct) == GPIO.HIGH:
-				sleep(0.01)
-		
-		
-		if trail == trailsMax:
-			myfile.close()
-			GPIO.cleanup()
-			break
+        if GPIO.input(leverLeftAct) == GPIO.HIGH:
+            GPIO.output(feeder,GPIO.HIGH)
+            time1 = time.time()
+            trail = trail+1
+            timePast = round(time1-time0,2)
+            print ("Trail ",trail,"/",trailsMax)
+            print ("Time ",timePast,"\n")
+            time2 = time.time()
+            leverLeftActData = [str(trail),str(timePast)]
+            with open(day+"_"+answer2+'.csv','a+') as myfile:
+                writer = csv.writer(myfile)
+                writer.writerow(leverLeftActData)
+            print ("ITI",iti,"s:\n")
+            GPIO.output(leverLeftMove,GPIO.HIGH)
+            sleep(iti)
+            time0 = time.time()
+            while GPIO.input(leverLeftAct) == GPIO.HIGH:
+                sleep(0.01)
 
-		else:
-			GPIO.output(feeder,GPIO.HIGH)
-		sleep(0.01)
-		
-	
+        if trail == trailsMax:
+            myfile.close()
+            GPIO.cleanup()
+            break
+
+        else:
+            GPIO.output(feeder,GPIO.HIGH)
+        sleep(0.01)
+
+# 終了
+except KeyboardInterrupt:
+    pass
+
 #ポート釈放
 myfile.close()
 GPIO.cleanup()
-
